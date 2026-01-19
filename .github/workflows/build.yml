@@ -1,0 +1,85 @@
+name: Compile Kernel
+
+on:
+  workflow_dispatch:
+jobs:
+  PixelOS_Kernel_CI:
+    env:
+        CLANG_VER: clang-r547379
+        ARCH: arm64
+        SUBARCH: arm64
+        LLVM: "1"
+        LLVM_IAS: "1"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+            sudo apt update
+            sudo apt install -y \
+            bc bison flex \
+            libssl-dev \
+            build-essential \
+            git \
+            python3 \
+            curl
+
+      - name: Clone Kernel Source
+        run: |
+          git clone --depth=1 -b sixteen-qpr1 https://github.com/OnePlus12R-development/android_kernel_oneplus_sm8550.git sm8550
+          git clone --depth=1 -b sixteen-qpr1 https://github.com/OnePlus12R-development/android_kernel_oneplus_sm8550-modules.git sm8550-modules
+
+      - name: Download AOSP Clang
+        run: |
+          mkdir -p toolchains/${CLANG_VER}
+          cd toolchains
+
+          curl -LO https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/${CLANG_VER}.tar.gz
+          tar -xf "${CLANG_VER}.tar.gz" -C ${CLANG_VER}
+
+      - name: Compile Kernel
+        run: |
+          CLANG_ROOT="${GITHUB_WORKSPACE}/toolchains/${CLANG_VER}/bin"
+          export PATH="${CLANG_ROOT}:$PATH"
+          export ARCH=arm64
+          export SUBARCH=arm64
+          export LLVM=1
+          export LLVM_IAS=1
+          export CC="${CLANG_ROOT}/clang"
+          export CXX="${CLANG_ROOT}/clang++"
+          export HOSTCC="${CLANG_ROOT}/clang"
+          export HOSTCXX="${CLANG_ROOT}/clang++"
+          export LD="${CLANG_ROOT}/ld.lld"
+          export AR="${CLANG_ROOT}/llvm-ar"
+          export NM="${CLANG_ROOT}/llvm-nm"
+          export OBJCOPY="${CLANG_ROOT}/llvm-objcopy"
+          export OBJDUMP="${CLANG_ROOT}/llvm-objdump"
+          export STRIP="${CLANG_ROOT}/llvm-strip"
+
+          cd sm8550
+
+          curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/main/kernel/setup.sh" | bash -s master
+
+          git add .
+          git commit -m "Commit for clean status"
+
+          make O=out gki_defconfig vendor/kalama_GKI.config vendor/oplus/kalama_GKI.config vendor/debugfs.config
+          make -j$(nproc) O=out
+
+      - name: Make AnyKernel3
+        run: |
+          git clone https://github.com/osm0sis/AnyKernel3.git
+
+          cp sm8550/out/arch/arm64/boot/Image AnyKernel3/Image
+          cp sm8550/out/arch/arm64/boot/Image ../Image
+          cd AnyKernel3
+
+          zip -r9 ../KowSU.zip * -x .git README.md *placeholder
+
+      - name: Create GitHub Release
+        run: |
+          REL_NAME="PixelOS_OPSM8550_$(date -u +"%Y%m%d_%H%M")"
+          cd ${GITHUB_WORKSPACE}
+          gh release create "$REL_NAME" --title "$REL_NAME" --notes "" KowSU.zip Image

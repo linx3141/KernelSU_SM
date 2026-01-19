@@ -14,7 +14,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
+      - name: Enable swap
+        run: |
+          sudo fallocate -l 16G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+          
       - name: Install build dependencies
         run: |
             sudo apt update
@@ -71,7 +78,7 @@ jobs:
           git commit -m "Commit for clean status"
 
           make O=out gki_defconfig vendor/kalama_GKI.config vendor/oplus/kalama_GKI.config vendor/debugfs.config
-          make -j$(nproc) O=out
+          make -j2 O=out
 
       - name: Make AnyKernel3
         run: |

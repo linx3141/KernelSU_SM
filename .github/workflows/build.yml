@@ -21,7 +21,10 @@ jobs:
             sudo apt install -y \
             bc bison flex \
             libssl-dev \
+            libelf-dev \
+            libdw-dev \
             build-essential \
+            lz4 \
             git \
             python3 \
             curl

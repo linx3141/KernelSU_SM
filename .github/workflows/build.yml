@@ -75,7 +75,7 @@ jobs:
 
       - name: Make AnyKernel3
         run: |
-          git clone https://github.com/osm0sis/AnyKernel3.git
+          git clone https://github.com/Kernel-SU/AnyKernel3.git
 
           cp sm8550/out/arch/arm64/boot/Image AnyKernel3/Image
           cp sm8550/out/arch/arm64/boot/Image ./Image

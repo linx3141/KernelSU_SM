@@ -25,7 +25,7 @@ on:
           - OnePlus12R-development
           
       kernel_branch:
-        description: Kernel Branch(such as lineage-23.2 sixteen-qpr1
+        description: Kernel Branch(such as lineage-23.2 sixteen-qpr1)
         required: true
         type: string
         default: ""
@@ -42,6 +42,7 @@ on:
           - KowSU
           - ReSukiSU
           - ReSukiSU-with-susfs
+          
 jobs:
   SM8550_Kernel_CI:
     env:
@@ -82,15 +83,15 @@ jobs:
 
       - name: Download AOSP Clang
         run: |
-          mkdir -p toolchains/${{ clang_version }}
+          mkdir -p toolchains/${{ inputs.clang_version }}
           cd toolchains
 
-          curl -LO https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/android16-qpr2-release/${{ clang_version }}.tar.gz
-          tar -xf "${{ clang_version }}.tar.gz" -C ${{ clang_version }}
+          curl -LO https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/android16-qpr2-release/${{ inputs.clang_version }}.tar.gz
+          tar -xf "${{ inputs.clang_version }}.tar.gz" -C ${{ inputs.clang_version }}
 
       - name: Compile Kernel
         run: |
-          CLANG_ROOT="${GITHUB_WORKSPACE}/toolchains/${{ clang_version }}/bin"
+          CLANG_ROOT="${GITHUB_WORKSPACE}/toolchains/${{ inputs.clang_version }}/bin"
           export PATH="${CLANG_ROOT}:$PATH"
           export ARCH=arm64
           export SUBARCH=arm64

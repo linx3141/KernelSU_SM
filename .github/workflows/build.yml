@@ -22,7 +22,6 @@ on:
         options:
           - LineageOS
           - crdroidandroid
-          - OnePlus12R-development
           
       kernel_branch:
         description: Kernel Branch(such as lineage-23.2 sixteen-qpr1)
@@ -47,7 +46,7 @@ jobs:
   Kernel_CI:
     env:
         GH_TOKEN: ${{ github.token }}
-        SOC: sm8550
+        SOC: sm8650
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -139,13 +138,13 @@ jobs:
           esac
           
           if [[ "${{ inputs.ksu_type }}" == *susfs ]]; then
-            git clone -b gki-android13-5.15 https://gitlab.com/simonpunk/susfs4ksu.git susfs
+            git clone -b gki-android14-6.1 https://gitlab.com/simonpunk/susfs4ksu.git susfs
             cd susfs
-            cp ./kernel_patches/50_add_susfs_in_gki-android13-5.15.patch ..
+            cp ./kernel_patches/50_add_susfs_in_gki-android14-6.1.patch ..
             cp ./kernel_patches/fs/* ../fs/
             cp ./kernel_patches/include/linux/* ../include/linux/
             cd ..
-            patch -p1 < 50_add_susfs_in_gki-android13-5.15.patch
+            patch -p1 < 50_add_susfs_in_gki-android14-6.1.patch
             echo "CONFIG_KSU_SUSFS=y" >> arch/arm64/configs/gki_defconfig
             echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> arch/arm64/configs/gki_defconfig
             echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> arch/arm64/configs/gki_defconfig
@@ -160,8 +159,7 @@ jobs:
           touch ./.scmversion
           
           echo "CONFIG_TMPFS_XATTR=y" >> arch/arm64/configs/gki_defconfig
-          make O=out gki_defconfig vendor/kalama_GKI.config vendor/oplus/kalama_GKI.config vendor/debugfs.config
-          
+          make O=out gki_defconfig vendor/pineapple_GKI.config vendor/oplus/pineapple_GKI.config
           make -j2 O=out Image
 
       - name: Make AnyKernel3

@@ -129,7 +129,8 @@ jobs:
           cp sm8550/out/arch/arm64/boot/Image AnyKernel3/Image
           cp sm8550/out/arch/arm64/boot/Image ./Image
           cd AnyKernel3
-
+          sed -i "s|ksu_supported=false|ksu_supported=true|" anykernel.sh
+          
           zip -r9 ../"${ZIP_NAME}.zip" * -x .git
 
       - name: Create GitHub Release

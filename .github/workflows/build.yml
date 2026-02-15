@@ -35,7 +35,7 @@ on:
         type: choice
         options:
           - None
-          - KernelSU-by-\xx
+          - KernelSU-by-xx
           
 jobs:
   Kernel_CI:
@@ -111,7 +111,7 @@ jobs:
             "None")
               ;;
               
-            "KernelSU-by-\xx")
+            "KernelSU-by-xx")
               curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/refs/heads/master/kernel/setup.sh" | bash -s master
               ;;
           esac

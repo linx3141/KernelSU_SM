@@ -113,20 +113,19 @@ jobs:
               
             "KernelSU-by-xx")
               curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/refs/heads/master/kernel/setup.sh" | bash -s master
-              echo "CONFIG_KSU_TAMPER_SYSCALL_TABLE=y" > arch/arm64/configs/vendor/sm8150-perf_defconfig
               ;;
           esac
 
           touch ./.scmversion
           
           make O=out vendor/sm8150-perf_defconfig vendor/oplus.config
+          echo "CONFIG_KSU_TAMPER_SYSCALL_TABLE=y" >> out/.config
           make -j2 O=out Image
 
       - name: Make AnyKernel3
         run: |
           ZIP_NAME="${{ inputs.ksu_type }}_$(date -u +"%Y%m%d_%H%M")"
           git clone https://github.com/Kernel-SU/AnyKernel3.git
-
           cp ${SOC}/out/arch/arm64/boot/Image AnyKernel3/Image
           cp ${SOC}/out/arch/arm64/boot/Image ./Image
           cd AnyKernel3

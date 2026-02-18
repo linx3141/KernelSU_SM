@@ -53,6 +53,12 @@ on:
           - KowSU
           - ReSukiSU
           - ReSukiSU-with-susfs
+
+      kernel_name:
+        description: "Custom Kernel Name (e.g. -MyKernel, leave blank to use default)"
+        required: false
+        type: string
+        default: ""
           
 jobs:
   Kernel_CI:
@@ -171,6 +177,17 @@ jobs:
           touch ./.scmversion
           sed -i "s|CONFIG_MODULE_SIG_PROTECT=y|CONFIG_MODULE_SIG_PROTECT=n|" arch/arm64/configs/gki_defconfig
           echo "CONFIG_TMPFS_XATTR=y" >> arch/arm64/configs/gki_defconfig
+
+          # Apply custom kernel name if provided
+          if [[ -n "${{ inputs.kernel_name }}" ]]; then
+            CUSTOM_NAME="${{ inputs.kernel_name }}"
+            if [[ "${CUSTOM_NAME}" != -* ]]; then
+              CUSTOM_NAME="-${CUSTOM_NAME}"
+            fi
+            echo "CONFIG_LOCALVERSION=\"${CUSTOM_NAME}\"" >> arch/arm64/configs/gki_defconfig
+            echo "Kernel name set to: ${CUSTOM_NAME}"
+          fi
+
           make O=out gki_defconfig vendor/pineapple_GKI.config vendor/oplus/pineapple_GKI.config
           make -j2 O=out Image
 

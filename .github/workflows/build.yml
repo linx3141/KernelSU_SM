@@ -22,7 +22,6 @@ on:
         options:
           - LineageOS
           - crdroidandroid
-          - ReSukiSU-with-susfs
           
       kernel_branch:
         description: Kernel Branch(such as lineage-23.2 sixteen-qpr1)
@@ -37,7 +36,7 @@ on:
         options:
           - None
           - KernelSU-by-xx
-          
+          - ReSukiSU-with-susfs
 jobs:
   Kernel_CI:
     env:
